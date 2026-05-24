@@ -30,7 +30,6 @@ This text was translated using a translation tool; please let me know if you spo
 4-1. Ensure your MaaNTE is located in a path consisting solely of English characters and contains no full-width characters (it’s best to avoid any special characters as well).
 4-2. Ensure you are running MaaNTE as an administrator.
 4-3. If you cannot click normally, try changing the mouse input mode to `Seize`.
-4-4. Ensure Windows screen scaling is set to 100%.
 
 5. Mouse Seizure Issues
 5-1. In `Settings > Connection Settings`, change the mouse mode to `SendMessageWithWindowPos`. However, some tasks that require a foreground controller need `Seize` (which will seize the mouse).

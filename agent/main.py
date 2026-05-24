@@ -523,7 +523,7 @@ def _check_admin_privilege():
 
 def _check_game_resolution():
     """连接控制器后检测游戏窗口分辨率"""
-    from utils.win32_process import find_window_by_process, get_client_size
+    from utils.win32_process import find_window_by_process, get_client_size, get_dpi_scale
 
     hwnd = find_window_by_process("HTGame.exe")
     if hwnd is None:
@@ -536,14 +536,18 @@ def _check_game_resolution():
         return
 
     w, h = size
-    screen.update_screen_size(w, h)
+    dpi_scale = get_dpi_scale()
+    # 归一化到逻辑像素（MaaFramework 的 display_short_side 已处理物理→720p 的缩放）
+    logical_w = round(w / dpi_scale)
+    logical_h = round(h / dpi_scale)
+    screen.update_screen_size(logical_w, logical_h)
     scale_x, scale_y = screen.scaling_factors()
 
-    if (w, h) == (screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT):
-        logger.info(f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})")
+    if (logical_w, logical_h) == (screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT):
+        logger.info(f"当前窗口分辨率: {logical_w}x{logical_h} [正常], dpi_scale={dpi_scale:.2f}")
     else:
         logger.warning(
-            f"当前窗口分辨率: {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
+            f"当前窗口分辨率: {logical_w}x{logical_h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
             "请将游戏设置为 1280x720 窗口化模式，否则部分功能可能异常。"
         )
 

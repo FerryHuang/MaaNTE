@@ -3,6 +3,7 @@ from ctypes import wintypes
 
 user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
+gdi32 = ctypes.windll.gdi32
 
 # 使进程感知 DPI，避免 GetClientRect 返回缩放后的虚拟坐标
 # 150% 缩放时未设置此项会导致返回值只有实际分辨率的 2/3
@@ -70,3 +71,14 @@ def get_client_size(hwnd):
     if not user32.GetClientRect(hwnd, ctypes.byref(rect)):
         return None
     return rect.right - rect.left, rect.bottom - rect.top
+
+
+def get_dpi_scale() -> float:
+    """获取 Windows 显示缩放比例。100% → 1.0, 125% → 1.25, 150% → 1.5"""
+    try:
+        hdc = user32.GetDC(0)
+        dpi = gdi32.GetDeviceCaps(hdc, 88)  # LOGPIXELSX
+        user32.ReleaseDC(0, hdc)
+        return dpi / 96.0 if dpi else 1.0
+    except Exception:
+        return 1.0
